@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>chequeitt - Your Daily Companion</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PWA Requirements -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top App Bar -->
+        <header class="app-header">
+            <div class="logo">
+                <h1>chequeitt</h1>
+            </div>
+            <div class="streak-badge" id="streakBadge">
+                <i class="ph-fill ph-fire"></i>
+                <span id="streakCount">0</span>
+            </div>
+            <button class="icon-btn install-btn" id="installBtn" aria-label="Install App" style="display: none;">
+                <i class="ph ph-download-simple"></i>
+            </button>
+        </header>
+
+        <!-- Notification Permission Banner -->
+        <div class="notification-banner" id="notificationBanner" style="display: none;">
+            <div class="banner-content">
+                <i class="ph ph-bell-ringing"></i>
+                <span>Enable notifications for routine reminders.</span>
+            </div>
+            <button class="btn-text" id="enableNotificationsBtn">Enable</button>
+        </div>
+
+        <!-- Mascot Display -->
+        <section class="mascot-section">
+            <div class="mascot-container" id="mascotContainer">
+                <div class="mascot-ring" id="mascotRing"></div>
+                <div class="mascot-face" id="mascotFace">
+                    <!-- Default Neutral Face -->
+                    <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="16" />
+                        <circle cx="92" cy="108" r="16" fill="currentColor" />
+                        <circle cx="164" cy="108" r="16" fill="currentColor" />
+                        <line x1="88" y1="160" x2="168" y2="160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="16" />
+                    </svg>
+                </div>
+            </div>
+            <div class="mascot-message" id="mascotMessage">
+                I'm waiting for you to finish today's tasks.
+            </div>
+        </section>
+
+        <!-- Daily Tasks -->
+        <section class="tasks-section">
+            <div class="section-header">
+                <h2>Today's Routine</h2>
+                <button class="icon-btn" id="addTaskBtn" aria-label="Add Task">
+                    <i class="ph ph-plus"></i>
+                </button>
+            </div>
+            
+            <div class="tasks-list" id="tasksList">
+                <!-- Tasks injected here -->
+            </div>
+        </section>
+
+        <!-- Add Task Modal -->
+        <div class="modal-overlay" id="addTaskModal">
+            <div class="modal-card">
+                <h3>New Task</h3>
+                <input type="text" id="taskInput" placeholder="What do you need to do?" autocomplete="off" />
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelTaskBtn">Cancel</button>
+                    <button class="btn btn-primary" id="saveTaskBtn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Untick Confirmation Modal -->
+        <div class="modal-overlay" id="confirmUntickModal">
+            <div class="modal-card">
+                <h3>Undo Task?</h3>
+                <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.95rem;">Are you sure you want to undo this task? Your streak and mascot will be updated.</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelUntickBtn">Keep It Done</button>
+                    <button class="btn btn-danger" id="confirmUntickBtn">Yes, Undo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal-overlay" id="confirmDeleteModal">
+            <div class="modal-card">
+                <h3>Delete Task?</h3>
+                <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.95rem;">This task will be permanently removed. Are you sure?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.error('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
