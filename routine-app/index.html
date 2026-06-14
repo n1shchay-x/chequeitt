@@ -26,6 +26,16 @@
             <h1 style="font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--text-main), var(--neutral-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">chequeitt</h1>
         </div>
     </div>
+    <script>
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                splash.style.opacity = '0';
+                splash.style.pointerEvents = 'none';
+                setTimeout(() => splash.remove(), 500);
+            }
+        }, 1200);
+    </script>
     
     <div class="app-container">
         <!-- Top App Bar -->

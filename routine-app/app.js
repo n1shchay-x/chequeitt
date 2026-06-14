@@ -582,14 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (walkOfShameModal) walkOfShameModal.style.display = 'flex';
     }
 
-    // Splash Screen Failsafe
-    const splash = document.getElementById('splashScreen');
-    if (splash) {
-        setTimeout(() => {
-            splash.style.opacity = '0';
-            setTimeout(() => splash.remove(), 500);
-        }, 800);
-    }
 });
 
 // Walk of Shame Inputs
