@@ -51,6 +51,8 @@ const cancelTaskBtn = document.getElementById('cancelTaskBtn');
 const saveTaskBtn = document.getElementById('saveTaskBtn');
 const notificationBanner = document.getElementById('notificationBanner');
 const enableNotificationsBtn = document.getElementById('enableNotificationsBtn');
+const themeBtn = document.getElementById('themeBtn');
+const themeIcon = document.getElementById('themeIcon');
 
 // Confirm Untick Modal Elements
 const confirmUntickModal = document.getElementById('confirmUntickModal');
@@ -108,10 +110,57 @@ function checkNotificationPermission() {
     }
 }
 
+const NOTIFICATIONS = {
+    streak_secured: [
+        { title: "Streak Secured! 🔥", body: "You survived another day. The mascot is pleased." },
+        { title: "Phew... 😅", body: "Your streak is safe. I can finally relax." },
+        { title: "Great job! 🎉", body: "Routine complete. See you tomorrow!" }
+    ],
+    streak_broken: [
+        { title: "Streak Broken 😠", body: "I trusted you. We had a good thing going. Now look at us." },
+        { title: "Really? 💔", body: "You missed yesterday's routine. Don't make me angry again today." },
+        { title: "Back to ZERO. 📉", body: "All that hard work, gone. Let's restart today." }
+    ],
+    reminder_neutral: [
+        { title: "Time to chequeitt! ⏱️", body: "Friendly reminder: tasks are waiting for you." },
+        { title: "Knock knock 👀", body: "You have unfinished business today." },
+        { title: "Still there? 🐢", body: "Your routine isn't going to complete itself." }
+    ],
+    reminder_anxious: [
+        { title: "It's getting late... 😰", body: "Have you started your routine? I'm getting nervous." },
+        { title: "Uh oh... 🕰️", body: "The day is slipping away. Please do your tasks!" },
+        { title: "Don't do this to me 🥺", body: "I hate seeing unfinished tasks this late." }
+    ],
+    reminder_panic: [
+        { title: "TIME IS RUNNING OUT! 🚨", body: "Finish your routine NOW! Don't break our streak!" },
+        { title: "CODE RED! 🆘", body: "Midnight is approaching! Do your tasks immediately!" },
+        { title: "PLEASE! I'M BEGGING YOU! 😭", body: "Just tick one task! Don't let our streak die!" }
+    ]
+};
+
+function getRandomNotification(type) {
+    const pool = NOTIFICATIONS[type];
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function sendLocalNotification(title, body) {
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification(title, { body: body, icon: "icon.svg" });
     }
+}
+
+// Dynamic Favicon Generator
+function updateDynamicFavicon(svgContent, color) {
+    const favicon = document.getElementById('dynamicFavicon');
+    if (!favicon) return;
+    
+    // Convert the raw inner SVG string into a valid, standalone SVG document
+    const encodedColor = encodeURIComponent(color);
+    const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="color: ${encodedColor}; width: 100%; height: 100%;">${svgContent}</svg>`;
+    
+    // Base64 encode it
+    const base64Svg = btoa(unescape(encodeURIComponent(fullSvg)));
+    favicon.href = 'data:image/svg+xml;base64,' + base64Svg;
 }
 
 // Dynamic Cursor Lighting
@@ -251,7 +300,8 @@ function updateUI() {
             void ring.offsetWidth; // trigger reflow
             ring.classList.add('ripple');
             
-            sendLocalNotification("Streak Secured! 🔥", "Great job! You saved your daily streak.");
+            const msg = getRandomNotification('streak_secured');
+            sendLocalNotification(msg.title, msg.body);
             
             saveState();
             return; // triggers re-render with new streak
@@ -259,6 +309,7 @@ function updateUI() {
 
         mascotContainer.classList.add('state-happy');
         mascotFace.innerHTML = `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${FACES.happy}</svg>`;
+        updateDynamicFavicon(FACES.happy, '#10b981'); // happy-color
         if (uncompletedCount === 0) {
             mascotMessage.textContent = "Amazing job! You crushed your entire routine today.";
         } else {
@@ -268,11 +319,13 @@ function updateUI() {
         // Streak broken
         mascotContainer.classList.add('state-angry');
         mascotFace.innerHTML = `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${FACES.angry}</svg>`;
+        updateDynamicFavicon(FACES.angry, '#ef4444'); // angry-color
         mascotMessage.textContent = "You missed your routine yesterday! Don't let me down today.";
         
         // Notify user about broken streak if they just loaded
         if (!window._streakNotified) {
-            sendLocalNotification("Streak Broken 😠", "You missed yesterday's routine! Let's get back on track today.");
+            const msg = getRandomNotification('streak_broken');
+            sendLocalNotification(msg.title, msg.body);
             window._streakNotified = true;
         }
     } else {
@@ -292,10 +345,16 @@ function updateUI() {
             const slotKey = `${today}-${currentSlot}`;
             if (appState.lastRemindedSlot !== slotKey) {
                 appState.lastRemindedSlot = slotKey;
+                // Get the appropriate message pool based on time
+                let notifType = 'reminder_neutral';
+                if (hours >= 21) notifType = 'reminder_panic';
+                else if (hours >= 18) notifType = 'reminder_anxious';
+                
                 // Send notification for EACH uncompleted task
                 appState.tasks.forEach(t => {
                     if (t.completedAt !== today) {
-                        sendLocalNotification("Time to chequeitt! ⏱️", `Friendly reminder: "${t.text}" is waiting for you.`);
+                        const msg = getRandomNotification(notifType);
+                        sendLocalNotification(msg.title, msg.body + ` ("${t.text}")`);
                     }
                 });
                 saveState(); // save the slot immediately
@@ -305,10 +364,12 @@ function updateUI() {
         if (totalTasks === 0) {
             mascotContainer.className = 'mascot-container state-neutral';
             mascotFace.innerHTML = `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${FACES.neutral}</svg>`;
+            updateDynamicFavicon(FACES.neutral, '#94a3b8'); // neutral-color
             mascotMessage.textContent = "Add some tasks to get started.";
         } else if (hours >= 21) {
             mascotContainer.className = 'mascot-container state-panic';
             mascotFace.innerHTML = `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${FACES.panic}</svg>`;
+            updateDynamicFavicon(FACES.panic, '#d97706'); // primary / amber glow
             const midnight = new Date();
             midnight.setHours(24, 0, 0, 0);
             const diffMs = midnight - now;
@@ -317,17 +378,20 @@ function updateUI() {
             mascotMessage.textContent = `Only ${diffHrs}h ${diffMins}m left! Please don't break our streak!`;
             
             if (!window._panicNotified) {
-                sendLocalNotification("Time is running out! ⏰", `Only ${diffHrs}h ${diffMins}m left to finish your routine.`);
+                const msg = getRandomNotification('reminder_panic');
+                sendLocalNotification(msg.title, `Only ${diffHrs}h ${diffMins}m left. ` + msg.body);
                 window._panicNotified = true;
             }
         } else if (hours >= 18) {
             mascotContainer.className = 'mascot-container state-anxious';
             mascotFace.innerHTML = `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${FACES.anxious}</svg>`;
+            updateDynamicFavicon(FACES.anxious, '#d97706'); // primary / amber glow
             mascotMessage.textContent = "It's getting late... Have you started your routine?";
         } else {
             if (!mascotContainer.classList.contains('state-panic') && !mascotContainer.classList.contains('state-anxious')) {
                 mascotContainer.className = 'mascot-container state-neutral';
                 mascotFace.innerHTML = `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">${FACES.neutral}</svg>`;
+                updateDynamicFavicon(FACES.neutral, '#94a3b8'); // neutral-color
                 mascotMessage.textContent = "I'm waiting for you to finish today's tasks.";
             }
         }
@@ -467,6 +531,28 @@ document.addEventListener('DOMContentLoaded', () => {
     checkNotificationPermission();
     updateUI();
 });
+
+// --- Theme Management ---
+let currentTheme = localStorage.getItem('aura_theme') || 'dark';
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (themeIcon) {
+        // In dark mode, show a sun to switch to light. In light mode, show a moon.
+        themeIcon.className = theme === 'dark' ? 'ph ph-sun' : 'ph ph-moon';
+    }
+}
+applyTheme(currentTheme);
+
+if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+        triggerHaptic();
+        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('aura_theme', currentTheme);
+        applyTheme(currentTheme);
+    });
+}
+
 
 if (enableNotificationsBtn) {
     enableNotificationsBtn.addEventListener('click', () => {
