@@ -4,9 +4,15 @@
   "description": "Your daily routine companion.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#1c1917",
+  "theme_color": "#d97706",
   "icons": [
+    {
+      "src": "badge.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    },
     {
       "src": "icon-192x192.png",
       "sizes": "192x192",

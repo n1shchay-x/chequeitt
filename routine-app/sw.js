@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aura-routine-v18';
+const CACHE_NAME = 'aura-routine-v19';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
