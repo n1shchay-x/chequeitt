@@ -186,6 +186,7 @@ function sendLocalNotification(title, body, faceSvgContent = null, color = null)
         let iconUrl = "icon.svg";
         if (faceSvgContent && color) {
             try {
+                // Generate the dynamic colored SVG
                 const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="color: ${color}; width: 100%; height: 100%; background: #1c1917; border-radius: 50%; padding: 10px; box-sizing: border-box;">${faceSvgContent}</svg>`;
                 const base64Svg = btoa(fullSvg);
                 iconUrl = 'data:image/svg+xml;base64,' + base64Svg;
@@ -193,7 +194,25 @@ function sendLocalNotification(title, body, faceSvgContent = null, color = null)
                 console.error('SVG encode error', e);
             }
         }
-        new Notification(title, { body: body, icon: iconUrl });
+        
+        const options = { 
+            body: body, 
+            icon: iconUrl,
+            badge: 'icon.svg', // Fixes the ugly blue box on Windows/Android
+            vibrate: [200, 100, 200]
+        };
+
+        // Mobile PWAs require Service Worker to show notifications reliably
+        if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(title, options);
+            }).catch(err => {
+                // Fallback for desktop if SW isn't ready
+                new Notification(title, options);
+            });
+        } else {
+            new Notification(title, options);
+        }
     }
 }
 
