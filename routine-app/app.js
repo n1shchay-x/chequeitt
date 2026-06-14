@@ -14,7 +14,13 @@ const defaultState = {
     level: 1
 };
 
-let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+let appState;
+try {
+    appState = JSON.parse(localStorage.getItem(STORAGE_KEY));
+} catch (e) {
+    console.error("Failed to read from localStorage", e);
+}
+if (!appState) appState = defaultState;
 
 // Bulletproof the state structure in case of corrupted local storage
 if (!appState.tasks || !Array.isArray(appState.tasks)) {
@@ -27,7 +33,12 @@ if (typeof appState.xp !== 'number') appState.xp = 0;
 if (typeof appState.level !== 'number') appState.level = 1;
 
 function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    } catch (e) {
+        console.error('Save error', e);
+        alert('ERROR: Your browser is blocking data saves. If you are in Incognito or Secret Mode, please turn it off! (' + e.message + ')');
+    }
     updateUI();
 }
 
