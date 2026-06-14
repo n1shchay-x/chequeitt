@@ -19,15 +19,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-logo">
+            <i class="ph-fill ph-fire splash-icon"></i>
+            <h1 style="font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--text-main), var(--neutral-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">chequeitt</h1>
+        </div>
+    </div>
+    
     <div class="app-container">
         <!-- Top App Bar -->
         <header class="app-header">
             <div class="logo">
                 <h1>chequeitt</h1>
             </div>
-            <div class="streak-badge" id="streakBadge">
-                <i class="ph-fill ph-fire"></i>
-                <span id="streakCount">0</span>
+            <div class="header-stats" style="display: flex; gap: 8px; align-items: center;">
+                <div class="streak-badge" id="xpBadge" style="color: var(--primary);">
+                    <i class="ph-fill ph-star"></i>
+                    <span id="xpCount">0 XP</span>
+                </div>
+                <div class="streak-badge" id="streakBadge">
+                    <i class="ph-fill ph-fire"></i>
+                    <span id="streakCount">0</span>
+                </div>
             </div>
             <div style="display: flex; gap: 8px;">
                 <button class="icon-btn theme-btn" id="themeBtn" aria-label="Toggle Theme">
@@ -114,6 +128,20 @@
                     <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
                     <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Walk of Shame Modal -->
+        <div class="modal-overlay" id="walkOfShameModal" style="background: var(--bg-dark); z-index: 9998; display: none;">
+            <div class="modal-card" style="text-align: center;">
+                <i class="ph-fill ph-warning-circle" style="font-size: 4rem; color: var(--angry-color); margin-bottom: 16px;"></i>
+                <h3 style="color: var(--angry-color); margin-bottom: 12px; font-size: 1.5rem;">Streak Broken.</h3>
+                <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">You let your routine die. To unlock your app, you must physically pledge to do better.</p>
+                <div style="background: var(--bg-card); padding: 16px; border-radius: 8px; margin-bottom: 24px; font-style: italic; color: var(--text-main); border: 1px dashed var(--border-glass);">
+                    "I will not let my routine die again"
+                </div>
+                <input type="text" id="shameInput" placeholder="Type the pledge exactly to unlock..." autocomplete="off" />
+                <button class="btn btn-danger" id="unlockAppBtn" style="width: 100%; opacity: 0.5;" disabled>Unlock App</button>
             </div>
         </div>
 

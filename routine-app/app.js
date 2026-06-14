@@ -10,6 +10,8 @@ const defaultState = {
     tasks: [], // { id: string, text: string, completedAt: string | null }
     streak: 0,
     lastCompletedDate: null, // YYYY-MM-DD string
+    xp: 0,
+    level: 1
 };
 
 let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
@@ -21,6 +23,8 @@ if (!appState.tasks || !Array.isArray(appState.tasks)) {
 if (typeof appState.streak !== 'number') {
     appState.streak = 0;
 }
+if (typeof appState.xp !== 'number') appState.xp = 0;
+if (typeof appState.level !== 'number') appState.level = 1;
 
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
@@ -41,6 +45,10 @@ function getYesterdayString() {
 // --- DOM Elements ---
 const tasksListEl = document.getElementById('tasksList');
 const streakCountEl = document.getElementById('streakCount');
+const xpCountEl = document.getElementById('xpCount');
+const walkOfShameModal = document.getElementById('walkOfShameModal');
+const shameInput = document.getElementById('shameInput');
+const unlockAppBtn = document.getElementById('unlockAppBtn');
 const mascotContainer = document.getElementById('mascotContainer');
 const mascotFace = document.getElementById('mascotFace');
 const mascotMessage = document.getElementById('mascotMessage');
@@ -77,6 +85,24 @@ function playDing() {
         osc.frequency.setValueAtTime(880, ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
+}
+
+let heartbeatInterval = null;
+function playHeartbeat() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(50, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
         osc.connect(gain);
         gain.connect(ctx.destination);
@@ -172,41 +198,41 @@ document.addEventListener('mousemove', (e) => {
 // --- Mascot Expressions (SVGs) ---
 const FACES = {
     neutral: `
-        <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="16" />
-        <circle cx="92" cy="108" r="16" fill="currentColor" />
-        <circle cx="164" cy="108" r="16" fill="currentColor" />
-        <line x1="88" y1="160" x2="168" y2="160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="16" />
+        <path d="M128 32 C128 32 64 96 64 160 C64 195 92 224 128 224 C164 224 192 195 192 160 C192 96 128 32 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
+        <circle cx="104" cy="140" r="10" fill="currentColor"/>
+        <circle cx="152" cy="140" r="10" fill="currentColor"/>
+        <line x1="112" y1="170" x2="144" y2="170" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
     `,
     happy: `
-        <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="16" />
-        <path d="M76 108 Q92 88 108 108" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
-        <path d="M148 108 Q164 88 180 108" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
-        <path d="M80 150 Q128 190 176 150" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <path d="M128 32 C128 32 64 96 64 160 C64 195 92 224 128 224 C164 224 192 195 192 160 C192 96 128 32 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
+        <path d="M96 140 Q104 128 112 140" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <path d="M144 140 Q152 128 160 140" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <path d="M104 164 Q128 184 152 164" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
     `,
     angry: `
-        <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="16" />
-        <circle cx="92" cy="116" r="12" fill="currentColor" />
-        <circle cx="164" cy="116" r="12" fill="currentColor" />
-        <line x1="72" y1="90" x2="108" y2="100" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="16" />
-        <line x1="184" y1="90" x2="148" y2="100" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="16" />
-        <path d="M96 168 Q128 150 160 168" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <path d="M128 40 C128 40 56 100 64 168 C70 210 100 224 128 224 C156 224 186 210 192 168 C200 100 128 40 128 40 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
+        <circle cx="104" cy="150" r="8" fill="currentColor"/>
+        <circle cx="152" cy="150" r="8" fill="currentColor"/>
+        <line x1="90" y1="130" x2="116" y2="142" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <line x1="166" y1="130" x2="140" y2="142" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <path d="M110 180 Q128 170 146 180" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
     `,
     anxious: `
-        <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="16" />
-        <circle cx="92" cy="116" r="14" fill="currentColor" />
-        <circle cx="164" cy="116" r="14" fill="currentColor" />
-        <path d="M88 160 Q108 140 128 160 T168 160" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
-        <path d="M200 64 Q216 80 216 100 Q216 116 200 116 Q184 116 184 100 Q184 80 200 64" fill="currentColor" />
+        <path d="M128 32 C128 32 64 96 64 160 C64 195 92 224 128 224 C164 224 192 195 192 160 C192 96 128 32 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
+        <circle cx="104" cy="140" r="12" fill="currentColor"/>
+        <circle cx="152" cy="140" r="12" fill="currentColor"/>
+        <path d="M104 176 Q116 166 128 176 T152 176" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="170" cy="100" r="8" fill="currentColor"/>
+        <path d="M166 104 L170 120 L174 104 Z" fill="currentColor"/>
     `,
     panic: `
-        <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="16" />
-        <circle cx="92" cy="108" r="20" fill="none" stroke="currentColor" stroke-width="12" />
-        <circle cx="164" cy="108" r="20" fill="none" stroke="currentColor" stroke-width="12" />
-        <circle cx="92" cy="108" r="6" fill="currentColor" />
-        <circle cx="164" cy="108" r="6" fill="currentColor" />
-        <ellipse cx="128" cy="168" rx="24" ry="32" fill="none" stroke="currentColor" stroke-width="16" />
-        <line x1="72" y1="76" x2="112" y2="64" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
-        <line x1="184" y1="76" x2="144" y2="64" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <path d="M128 32 C120 48 56 96 64 160 C68 190 92 220 128 220 C164 220 188 190 192 160 C200 96 136 48 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
+        <circle cx="104" cy="136" r="16" fill="none" stroke="currentColor" stroke-width="10"/>
+        <circle cx="152" cy="136" r="16" fill="none" stroke="currentColor" stroke-width="10"/>
+        <circle cx="104" cy="136" r="4" fill="currentColor"/>
+        <circle cx="152" cy="136" r="4" fill="currentColor"/>
+        <ellipse cx="128" cy="184" rx="16" ry="24" fill="none" stroke="currentColor" stroke-width="10"/>
+        <path d="M50 160 L40 156 M60 200 L50 204 M206 160 L216 156 M196 200 L206 204" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
     `
 };
 
@@ -277,12 +303,22 @@ function updateUI() {
         tasksListEl.appendChild(el);
     });
 
+    // Calculate Level
+    appState.level = Math.floor(appState.xp / 100) + 1;
+
     // Handle Streak & Mascot Logic
     streakCountEl.textContent = appState.streak;
+    if (xpCountEl) xpCountEl.textContent = `${appState.xp} XP (Lvl ${appState.level})`;
     mascotContainer.className = 'mascot-container'; // reset classes
     
     // Sync OS App Badge
     updateAppBadge(uncompletedCount);
+
+    // Stop heartbeat if running
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+    }
 
     // MINIMUM ONE TASK COMPLETED -> STREAK SECURED
     const streakSecuredToday = completedTodayCount > 0;
@@ -292,9 +328,8 @@ function updateUI() {
         if (appState.lastCompletedDate !== today) {
             appState.lastCompletedDate = today;
             appState.streak += 1;
+            appState.xp += 50; // Streak Bonus
             
-            // Sensory Feedback
-            playDing();
             const ring = document.getElementById('mascotRing');
             ring.classList.remove('ripple');
             void ring.offsetWidth; // trigger reflow
@@ -377,6 +412,12 @@ function updateUI() {
             const diffMins = Math.floor(((diffMs % 86400000) % 3600000) / 60000);
             mascotMessage.textContent = `Only ${diffHrs}h ${diffMins}m left! Please don't break our streak!`;
             
+            // Start heartbeat
+            if (!heartbeatInterval) {
+                heartbeatInterval = setInterval(playHeartbeat, 1500);
+                playHeartbeat();
+            }
+
             if (!window._panicNotified) {
                 const msg = getRandomNotification('reminder_panic');
                 sendLocalNotification(msg.title, `Only ${diffHrs}h ${diffMins}m left. ` + msg.body);
@@ -412,7 +453,9 @@ window.toggleTask = function(id) {
         if (task.completedAt !== today) {
             // Completing the task
             triggerHaptic();
+            playDing();
             task.completedAt = today;
+            appState.xp += 10;
             saveState();
         } else {
             // Trying to untick a completed task -> Show Confirmation Modal (Duolingo Style: Protect Progress)
@@ -530,7 +573,42 @@ function DOMPurify(str) {
 document.addEventListener('DOMContentLoaded', () => {
     checkNotificationPermission();
     updateUI();
+
+    // Check Walk of Shame
+    const today = getTodayString();
+    const yesterday = getYesterdayString();
+    if (appState.streak === 0 && appState.lastCompletedDate !== null && appState.lastCompletedDate !== today && appState.lastCompletedDate !== yesterday) {
+        // App is locked until they pledge
+        if (walkOfShameModal) walkOfShameModal.style.display = 'flex';
+    }
+
+    // Splash Screen Failsafe
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        setTimeout(() => {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.remove(), 500);
+        }, 800);
+    }
 });
+
+// Walk of Shame Inputs
+if (shameInput && unlockAppBtn && walkOfShameModal) {
+    const requiredPhrase = "I will not let my routine die again";
+    shameInput.addEventListener('input', (e) => {
+        if (e.target.value.trim() === requiredPhrase) {
+            unlockAppBtn.disabled = false;
+            unlockAppBtn.style.opacity = '1';
+        } else {
+            unlockAppBtn.disabled = true;
+            unlockAppBtn.style.opacity = '0.5';
+        }
+    });
+    unlockAppBtn.addEventListener('click', () => {
+        walkOfShameModal.style.opacity = '0';
+        setTimeout(() => walkOfShameModal.style.display = 'none', 300);
+    });
+}
 
 // --- Theme Management ---
 let currentTheme = localStorage.getItem('aura_theme') || 'dark';
