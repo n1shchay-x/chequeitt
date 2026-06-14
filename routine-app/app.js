@@ -195,44 +195,46 @@ document.addEventListener('mousemove', (e) => {
     document.documentElement.style.setProperty('--cursor-y', e.clientY + 'px');
 });
 
-// --- Mascot Expressions (SVGs) ---
 const FACES = {
     neutral: `
         <path d="M128 32 C128 32 64 96 64 160 C64 195 92 224 128 224 C164 224 192 195 192 160 C192 96 128 32 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
-        <circle cx="104" cy="140" r="10" fill="currentColor"/>
-        <circle cx="152" cy="140" r="10" fill="currentColor"/>
-        <line x1="112" y1="170" x2="144" y2="170" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <ellipse cx="104" cy="140" rx="8" ry="12" fill="currentColor"/>
+        <ellipse cx="152" cy="140" rx="8" ry="12" fill="currentColor"/>
+        <line x1="116" y1="176" x2="140" y2="176" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
     `,
     happy: `
         <path d="M128 32 C128 32 64 96 64 160 C64 195 92 224 128 224 C164 224 192 195 192 160 C192 96 128 32 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
-        <path d="M96 140 Q104 128 112 140" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
-        <path d="M144 140 Q152 128 160 140" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
-        <path d="M104 164 Q128 184 152 164" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <path d="M92 140 Q104 124 116 140" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <path d="M140 140 Q152 124 164 140" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <path d="M104 168 Q128 196 152 168" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+        <path d="M104 168 Q128 196 152 168 Z" fill="currentColor"/>
     `,
     angry: `
-        <path d="M128 40 C128 40 56 100 64 168 C70 210 100 224 128 224 C156 224 186 210 192 168 C200 100 128 40 128 40 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
+        <path d="M128 40 L100 80 L60 100 L70 150 L60 180 L90 220 L128 210 L166 220 L196 180 L186 150 L196 100 L156 80 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
         <circle cx="104" cy="150" r="8" fill="currentColor"/>
         <circle cx="152" cy="150" r="8" fill="currentColor"/>
-        <line x1="90" y1="130" x2="116" y2="142" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
-        <line x1="166" y1="130" x2="140" y2="142" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
-        <path d="M110 180 Q128 170 146 180" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+        <line x1="88" y1="124" x2="116" y2="140" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+        <line x1="168" y1="124" x2="140" y2="140" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+        <path d="M110 180 Q128 168 146 180" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
     `,
     anxious: `
         <path d="M128 32 C128 32 64 96 64 160 C64 195 92 224 128 224 C164 224 192 195 192 160 C192 96 128 32 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
-        <circle cx="104" cy="140" r="12" fill="currentColor"/>
-        <circle cx="152" cy="140" r="12" fill="currentColor"/>
-        <path d="M104 176 Q116 166 128 176 T152 176" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
-        <circle cx="170" cy="100" r="8" fill="currentColor"/>
-        <path d="M166 104 L170 120 L174 104 Z" fill="currentColor"/>
+        <circle cx="104" cy="140" r="14" fill="none" stroke="currentColor" stroke-width="8"/>
+        <circle cx="152" cy="140" r="14" fill="none" stroke="currentColor" stroke-width="8"/>
+        <circle cx="104" cy="140" r="4" fill="currentColor"/>
+        <circle cx="152" cy="140" r="4" fill="currentColor"/>
+        <path d="M104 180 Q112 172 120 180 T136 180 T152 180" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <path d="M180 80 C180 80 160 100 170 110 C180 120 190 100 180 80 Z" fill="#3b82f6" stroke="none"/>
     `,
     panic: `
-        <path d="M128 32 C120 48 56 96 64 160 C68 190 92 220 128 220 C164 220 188 190 192 160 C200 96 136 48 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round"/>
-        <circle cx="104" cy="136" r="16" fill="none" stroke="currentColor" stroke-width="10"/>
-        <circle cx="152" cy="136" r="16" fill="none" stroke="currentColor" stroke-width="10"/>
+        <path d="M128 32 C120 48 56 96 64 160 C68 190 92 220 128 220 C164 220 188 190 192 160 C200 96 136 48 128 32 Z" fill="none" stroke="currentColor" stroke-width="12" stroke-linejoin="round" stroke-dasharray="10 6"/>
+        <ellipse cx="104" cy="136" rx="16" ry="20" fill="none" stroke="currentColor" stroke-width="10"/>
+        <ellipse cx="152" cy="136" rx="20" ry="16" fill="none" stroke="currentColor" stroke-width="10"/>
         <circle cx="104" cy="136" r="4" fill="currentColor"/>
         <circle cx="152" cy="136" r="4" fill="currentColor"/>
         <ellipse cx="128" cy="184" rx="16" ry="24" fill="none" stroke="currentColor" stroke-width="10"/>
-        <path d="M50 160 L40 156 M60 200 L50 204 M206 160 L216 156 M196 200 L206 204" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <path d="M180 60 C180 60 150 90 165 110 C180 130 200 90 180 60 Z" fill="#3b82f6" stroke="none"/>
+        <path d="M50 160 L30 150 M60 200 L40 210 M206 160 L226 150 M196 200 L216 210" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
     `
 };
 
