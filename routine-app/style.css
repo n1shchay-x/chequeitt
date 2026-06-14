@@ -303,6 +303,7 @@ body::before {
     cursor: pointer;
     transition: all 0.2s ease;
     color: transparent;
+    flex-shrink: 0;
 }
 
 .task-item.completed .task-check {
