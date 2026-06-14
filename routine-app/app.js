@@ -198,7 +198,7 @@ function sendLocalNotification(title, body, faceSvgContent = null, color = null)
         const options = { 
             body: body, 
             icon: iconUrl,
-            badge: 'icon.svg', // Fixes the ugly blue box on Windows/Android
+            badge: 'badge.svg', // Monochrome transparent badge for OS status bars
             vibrate: [200, 100, 200]
         };
 
