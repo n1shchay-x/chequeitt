@@ -170,11 +170,47 @@ function getRandomNotification(type) {
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function sendLocalNotification(title, body) {
+function sendLocalNotification(title, body, faceSvgContent = null, color = null) {
     if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(title, { body: body, icon: "icon.svg" });
+        let iconUrl = "icon.svg";
+        if (faceSvgContent && color) {
+            try {
+                const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="color: ${color}; width: 100%; height: 100%; background: #1c1917; border-radius: 50%; padding: 10px; box-sizing: border-box;">${faceSvgContent}</svg>`;
+                const base64Svg = btoa(fullSvg);
+                iconUrl = 'data:image/svg+xml;base64,' + base64Svg;
+            } catch (e) {
+                console.error('SVG encode error', e);
+            }
+        }
+        new Notification(title, { body: body, icon: iconUrl });
     }
 }
+
+window.testNotification = function(type) {
+    Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+            let msg;
+            if (type === 'happy') {
+                msg = getRandomNotification('streak_secured');
+                sendLocalNotification(msg.title, msg.body, FACES.happy, '#10b981');
+            } else if (type === 'angry') {
+                msg = getRandomNotification('streak_broken');
+                sendLocalNotification(msg.title, msg.body, FACES.angry, '#ef4444');
+            } else if (type === 'neutral') {
+                msg = getRandomNotification('reminder_neutral');
+                sendLocalNotification(msg.title, msg.body, FACES.neutral, '#94a3b8');
+            } else if (type === 'anxious') {
+                msg = getRandomNotification('reminder_anxious');
+                sendLocalNotification(msg.title, msg.body, FACES.anxious, '#d97706');
+            } else if (type === 'panic') {
+                msg = getRandomNotification('reminder_panic');
+                sendLocalNotification(msg.title, msg.body, FACES.panic, '#d97706');
+            }
+        } else {
+            alert("Please enable notifications first!");
+        }
+    });
+};
 
 // Dynamic Favicon Generator
 function updateDynamicFavicon(svgContent, color) {
@@ -339,7 +375,7 @@ function updateUI() {
             ring.classList.add('ripple');
             
             const msg = getRandomNotification('streak_secured');
-            sendLocalNotification(msg.title, msg.body);
+            sendLocalNotification(msg.title, msg.body, FACES.happy, '#10b981');
             
             saveState();
             return; // triggers re-render with new streak
@@ -363,7 +399,7 @@ function updateUI() {
         // Notify user about broken streak if they just loaded
         if (!window._streakNotified) {
             const msg = getRandomNotification('streak_broken');
-            sendLocalNotification(msg.title, msg.body);
+            sendLocalNotification(msg.title, msg.body, FACES.angry, '#ef4444');
             window._streakNotified = true;
         }
     } else {
@@ -392,7 +428,11 @@ function updateUI() {
                 appState.tasks.forEach(t => {
                     if (t.completedAt !== today) {
                         const msg = getRandomNotification(notifType);
-                        sendLocalNotification(msg.title, msg.body + ` ("${t.text}")`);
+                        let face = FACES.neutral;
+                        let color = '#94a3b8';
+                        if (notifType === 'reminder_panic') { face = FACES.panic; color = '#d97706'; }
+                        else if (notifType === 'reminder_anxious') { face = FACES.anxious; color = '#d97706'; }
+                        sendLocalNotification(msg.title, msg.body + ` ("${t.text}")`, face, color);
                     }
                 });
                 saveState(); // save the slot immediately
@@ -423,7 +463,7 @@ function updateUI() {
 
             if (!window._panicNotified) {
                 const msg = getRandomNotification('reminder_panic');
-                sendLocalNotification(msg.title, `Only ${diffHrs}h ${diffMins}m left. ` + msg.body);
+                sendLocalNotification(msg.title, `Only ${diffHrs}h ${diffMins}m left. ` + msg.body, FACES.panic, '#d97706');
                 window._panicNotified = true;
             }
         } else if (hours >= 18) {

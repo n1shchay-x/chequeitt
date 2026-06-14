@@ -106,6 +106,18 @@
             </div>
         </section>
 
+        <!-- Debug Notification Panel -->
+        <section class="debug-panel" style="margin-top: 32px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 16px;">
+            <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 12px; text-align: center;">⚙️ Debug: Test Notifications</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+                <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;" onclick="window.testNotification('happy')">Test Happy</button>
+                <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;" onclick="window.testNotification('neutral')">Test Neutral</button>
+                <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;" onclick="window.testNotification('anxious')">Test Anxious</button>
+                <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;" onclick="window.testNotification('angry')">Test Angry</button>
+                <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; background: rgba(220, 38, 38, 0.2); color: #ef4444; border-color: #ef4444;" onclick="window.testNotification('panic')">Test Panic</button>
+            </div>
+        </section>
+
         <!-- Add Task Modal -->
         <div id="addTaskModal" class="modal-overlay">
             <form id="addTaskForm" class="modal-card">
