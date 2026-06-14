@@ -1,0 +1,4 @@
+node_modules/
+*.log
+make_badge.js
+convert.js

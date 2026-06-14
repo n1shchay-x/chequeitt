@@ -198,7 +198,7 @@ function sendLocalNotification(title, body, faceSvgContent = null, color = null)
         const options = { 
             body: body, 
             icon: iconUrl,
-            badge: 'badge.svg', // Monochrome transparent badge for OS status bars
+            badge: 'badge.png', // Monochrome transparent badge for OS status bars (PNG required for strict OS parsers)
             vibrate: [200, 100, 200]
         };
 
