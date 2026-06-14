@@ -237,11 +237,7 @@ function updateDynamicFavicon(svgContent, color) {
     favicon.href = 'data:image/svg+xml;base64,' + base64Svg;
 }
 
-// Dynamic Cursor Lighting
-document.addEventListener('mousemove', (e) => {
-    document.documentElement.style.setProperty('--cursor-x', e.clientX + 'px');
-    document.documentElement.style.setProperty('--cursor-y', e.clientY + 'px');
-});
+// Dynamic Cursor Lighting removed
 
 const FACES = {
     neutral: `

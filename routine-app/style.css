@@ -503,21 +503,7 @@ html, body {
     animation: glowRipple 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Dynamic Lighting Glassmorphism */
-body::before {
-    content: '';
-    position: fixed;
-    top: var(--cursor-y, -100px);
-    left: var(--cursor-x, -100px);
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%);
-    z-index: -1;
-    transition: top 0.2s cubic-bezier(0.16, 1, 0.3, 1), left 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-}
+/* Removed Dynamic Lighting Orb */
 
 /* --- Battle-Tested Responsiveness --- */
 
