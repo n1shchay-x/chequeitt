@@ -57,6 +57,7 @@ const addTaskModal = document.getElementById('addTaskModal');
 const taskInput = document.getElementById('taskInput');
 const cancelTaskBtn = document.getElementById('cancelTaskBtn');
 const saveTaskBtn = document.getElementById('saveTaskBtn');
+const addTaskForm = document.getElementById('addTaskForm');
 const notificationBanner = document.getElementById('notificationBanner');
 const enableNotificationsBtn = document.getElementById('enableNotificationsBtn');
 const themeBtn = document.getElementById('themeBtn');
@@ -534,28 +535,26 @@ addTaskBtn.addEventListener('click', () => {
 cancelTaskBtn.addEventListener('click', () => {
     addTaskModal.classList.remove('active');
     taskInput.value = '';
+    taskInput.blur();
 });
 
-// Allow hitting Enter to save
-taskInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        saveTaskBtn.click();
-    }
-});
-
-saveTaskBtn.addEventListener('click', () => {
-    const text = taskInput.value.trim();
-    if (text) {
-        appState.tasks.push({
-            id: Date.now().toString(),
-            text: text,
-            completedAt: null
-        });
-        saveState();
-        addTaskModal.classList.remove('active');
-        taskInput.value = '';
-    }
-});
+if (addTaskForm) {
+    addTaskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = taskInput.value.trim();
+        if (text) {
+            appState.tasks.push({
+                id: Date.now().toString(),
+                text: text,
+                completedAt: null
+            });
+            saveState();
+            addTaskModal.classList.remove('active');
+            taskInput.value = '';
+            taskInput.blur();
+        }
+    });
+}
 
 // Basic DOMPurify placeholder to prevent XSS (simulating the ironclad rule)
 function DOMPurify(str) {

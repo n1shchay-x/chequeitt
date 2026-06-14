@@ -107,15 +107,15 @@
         </section>
 
         <!-- Add Task Modal -->
-        <div class="modal-overlay" id="addTaskModal">
-            <div class="modal-card">
-                <h3>New Task</h3>
-                <input type="text" id="taskInput" placeholder="What do you need to do?" autocomplete="off" />
-                <div class="modal-actions">
-                    <button class="btn btn-secondary" id="cancelTaskBtn">Cancel</button>
-                    <button class="btn btn-primary" id="saveTaskBtn">Save</button>
+        <div id="addTaskModal" class="modal-overlay">
+            <form id="addTaskForm" class="modal-card">
+                <h3 style="margin-bottom: 16px;">Add New Task</h3>
+                <input type="text" id="taskInput" class="task-input" placeholder="e.g. Drink 2L water" autocomplete="off">
+                <div class="modal-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" id="cancelTaskBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveTaskBtn">Save Task</button>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- Untick Confirmation Modal -->
